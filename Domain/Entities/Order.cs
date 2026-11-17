@@ -1,4 +1,6 @@
-namespace OrdersWorkerService.Entities
+using OrdersWorkerService.Domain.Enums;
+
+namespace OrdersWorkerService.Domain.Entities
 {
     public class Order
     {

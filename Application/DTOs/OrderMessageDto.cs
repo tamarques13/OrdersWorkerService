@@ -1,5 +1,5 @@
 
-namespace OrdersWorkerService.DTOs;
+namespace OrdersWorkerService.Application.DTOs;
 
 public class OrderMessageDto
 {

@@ -1,7 +1,7 @@
-using OrdersWorkerService.Entities;
+using OrdersWorkerService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace OrdersWorkerService.Data
+namespace OrdersWorkerService.Infrastructure.Data
 {
     public class AppDbContext : DbContext
     {

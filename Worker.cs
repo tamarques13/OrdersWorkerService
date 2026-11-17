@@ -1,4 +1,4 @@
-using OrdersWorkerService.Services;
+using OrdersWorkerService.Application.Services;
 
 namespace OrdersWorkerService
 {

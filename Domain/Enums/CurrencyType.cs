@@ -1,4 +1,4 @@
-namespace OrdersWorkerService
+namespace OrdersWorkerService.Domain.Enums
 {
     public enum CurrencyType
     {

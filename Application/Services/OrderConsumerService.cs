@@ -3,17 +3,17 @@ using System.Text;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-using OrdersWorkerService.Validators;
-using OrdersWorkerService.DTOs;
+using OrdersWorkerService.Application.Validators;
+using OrdersWorkerService.Application.DTOs;
 using System.Text.Json;
 
-namespace OrdersWorkerService.Services
+namespace OrdersWorkerService.Application.Services
 {
-    public class OrderConsumerService(IConfiguration configuration, ILogger<OrderConsumerService> logger, OrderValidator validator)
+    public class OrderConsumerService(IConfiguration configuration, ILogger<OrderConsumerService> logger, OrderValidatorService validator)
     {
         private readonly IConfiguration _configuration = configuration;
         private readonly ILogger<OrderConsumerService> _logger = logger;
-        private readonly OrderValidator _validator = validator;
+        private readonly OrderValidatorService _validator = validator;
 
         public async Task StartAsync(CancellationToken stoppingToken)
         {
@@ -59,7 +59,7 @@ namespace OrdersWorkerService.Services
 
                     if (order == null)
                     {
-                        _logger.LogWarning("Message without a vadid order.");
+                        _logger.LogWarning("Message does not contain a valid order.");
                     }
                     else
                     {
@@ -71,7 +71,7 @@ namespace OrdersWorkerService.Services
                         }
                         else
                         {
-                            _logger.LogInformation("Order {OrderId} validated with success.", order.OrderId);
+                            _logger.LogInformation("Order {OrderId} validated successfully.", order.OrderId);
                         }
                     }
 
@@ -85,7 +85,7 @@ namespace OrdersWorkerService.Services
                 }
                 catch (JsonException)
                 {
-                    _logger.LogWarning("Not possible to deserialize message.");
+                    _logger.LogWarning("Could not deserialize the message.");
 
                     await channel.BasicAckAsync(
                         deliveryTag: args.DeliveryTag,

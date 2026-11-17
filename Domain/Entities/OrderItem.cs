@@ -1,4 +1,4 @@
-namespace OrdersWorkerService.Entities
+namespace OrdersWorkerService.Domain.Entities
 {
     public class OrderItem
     {

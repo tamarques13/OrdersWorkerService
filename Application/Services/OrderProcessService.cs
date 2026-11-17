@@ -27,23 +27,13 @@ namespace OrdersWorkerService.Application.Services
                 var order = new Order(message.TotalAmount, Enum.Parse<CurrencyType>(message.Currency));
                 var orderItem = new List<OrderItem>();
 
-                foreach (var item in message.Items)
-                {
-                    orderItem.Add(new OrderItem(
-                        order.Id,
-                        item.Quantity,
-                        item.UnitPrice
-                    ));
-                }
+                foreach (var item in message.Items) orderItem.Add(new OrderItem(order.Id, item.Quantity, item.UnitPrice));
 
                 try
                 {
                     await _orderRepository.AddAsync(order);
 
-                    foreach (var item in orderItem)
-                    {
-                        await _orderItemRepository.AddAsync(item);
-                    }
+                    foreach (var item in orderItem) await _orderItemRepository.AddAsync(item);
                 }
                 catch (Exception ex)
                 {
@@ -53,7 +43,7 @@ namespace OrdersWorkerService.Application.Services
             }
             else
             {
-                _logger.LogError("Must Provide a Currency and/or OrderItems");
+                _logger.LogError("Order Processing Failed.\n Must Provide a Currency and/or OrderItems");
             }
         }
     }

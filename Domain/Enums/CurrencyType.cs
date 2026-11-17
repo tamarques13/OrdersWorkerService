@@ -2,9 +2,9 @@ namespace OrdersWorkerService.Domain.Enums
 {
     public enum CurrencyType
     {
-        EUR = 0,
-        USD  = 1,
-        GBP  = 2,
-        CHF = 3
+        EUR,
+        USD,
+        GBP,
+        CHF
     }
 }

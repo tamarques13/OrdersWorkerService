@@ -3,17 +3,23 @@ using System.Text;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-using OrdersWorkerService.Application.Validators;
+using OrdersWorkerService.Application.Interfaces;
 using OrdersWorkerService.Application.DTOs;
 using System.Text.Json;
 
 namespace OrdersWorkerService.Application.Services
 {
-    public class OrderConsumerService(IConfiguration configuration, ILogger<OrderConsumerService> logger, OrderValidatorService validator)
+    public class OrderConsumerService(
+        IConfiguration configuration,
+        ILogger<OrderConsumerService> logger,
+        IOrderValidatorService validator,
+        IOrderProcessService orderProcessService)
+        : IOrderConsumerService
     {
         private readonly IConfiguration _configuration = configuration;
         private readonly ILogger<OrderConsumerService> _logger = logger;
-        private readonly OrderValidatorService _validator = validator;
+        private readonly IOrderValidatorService _validator = validator;
+        private readonly IOrderProcessService _orderProcessService = orderProcessService;
 
         public async Task StartAsync(CancellationToken stoppingToken)
         {
@@ -75,12 +81,8 @@ namespace OrdersWorkerService.Application.Services
                         }
                     }
 
+                    await _orderProcessService.ProcessAsync(order, stoppingToken);
 
-
-
-                    // Apenas para aprendizagem nesta fase.
-                    // Na implementação final, só fazemos ACK
-                    // depois de guardar a encomenda no PostgreSQL.
                     await channel.BasicAckAsync(deliveryTag: args.DeliveryTag, multiple: false);
                 }
                 catch (JsonException)

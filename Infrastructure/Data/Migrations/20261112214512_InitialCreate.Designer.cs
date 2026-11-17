@@ -9,7 +9,7 @@ using OrdersWorkerService.Infrastructure.Data;
 
 #nullable disable
 
-namespace OrdersWorkerService.Data.Migrations
+namespace OrdersWorkerService.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20261112214512_InitialCreate")]

@@ -8,7 +8,7 @@ using OrdersWorkerService.Infrastructure.Data;
 
 #nullable disable
 
-namespace OrdersWorkerService.Data.Migrations
+namespace OrdersWorkerService.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot

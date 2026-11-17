@@ -31,9 +31,9 @@ namespace OrdersWorkerService.Application.Services
 
                 try
                 {
-                    await _orderRepository.AddAsync(order);
+                    await _orderRepository.AddAsync(order, cancellationToken);
 
-                    foreach (var item in orderItem) await _orderItemRepository.AddAsync(item);
+                    foreach (var item in orderItem) await _orderItemRepository.AddAsync(item, cancellationToken);
                 }
                 catch (Exception ex)
                 {

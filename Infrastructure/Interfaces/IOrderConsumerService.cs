@@ -1,4 +1,4 @@
-namespace OrdersWorkerService.Application.Interfaces
+namespace OrdersWorkerService.Infrastructure.Interfaces
 {
     public interface IOrderConsumerService
     {

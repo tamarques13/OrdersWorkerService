@@ -1,25 +1,27 @@
 
 using System.Text;
+using System.Text.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-using OrdersWorkerService.Application.Interfaces;
 using OrdersWorkerService.Application.DTOs;
-using System.Text.Json;
+using OrdersWorkerService.Application.Interfaces;
 
-namespace OrdersWorkerService.Application.Services
+using OrdersWorkerService.Infrastructure.Interfaces;
+
+namespace OrdersWorkerService.Infrastructure.RabbitMQ
 {
     public class OrderConsumerService(
         IConfiguration configuration,
         ILogger<OrderConsumerService> logger,
-        IOrderValidatorService validator,
-        IOrderProcessService orderProcessService)
+        IOrderValidationService orderValidationService,
+        IServiceScopeFactory serviceScopeFactory)
         : IOrderConsumerService
     {
         private readonly IConfiguration _configuration = configuration;
         private readonly ILogger<OrderConsumerService> _logger = logger;
-        private readonly IOrderValidatorService _validator = validator;
-        private readonly IOrderProcessService _orderProcessService = orderProcessService;
+        private readonly IOrderValidationService _orderValidationService = orderValidationService;
+        private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
 
         public async Task StartAsync(CancellationToken stoppingToken)
         {
@@ -53,10 +55,12 @@ namespace OrdersWorkerService.Application.Services
                     if (order == null)
                     {
                         _logger.LogWarning("Message does not contain a valid order.");
+
+                        await channel.BasicAckAsync(args.DeliveryTag, multiple: false);
                     }
                     else
                     {
-                        var errors = _validator.Validate(order);
+                        var errors = _orderValidationService.ValidateOrder(order);
 
                         if (errors.Count > 0)
                         {
@@ -65,12 +69,15 @@ namespace OrdersWorkerService.Application.Services
                         else
                         {
                             _logger.LogInformation("Order {OrderId} validated successfully.", order.OrderId);
+
+                            await using var scope = _serviceScopeFactory.CreateAsyncScope();
+                            var orderProcessService = scope.ServiceProvider.GetRequiredService<IOrderProcessService>();
+
+                            await orderProcessService.ProcessAsync(order, stoppingToken);
+
+                            await channel.BasicAckAsync(args.DeliveryTag, multiple: false);
                         }
                     }
-
-                    await _orderProcessService.ProcessAsync(order, stoppingToken);
-
-                    await channel.BasicAckAsync(args.DeliveryTag, multiple: false);
                 }
                 catch (JsonException)
                 {
@@ -82,15 +89,18 @@ namespace OrdersWorkerService.Application.Services
                 {
                     _logger.LogError(ex, "Error when consuming the message.");
 
-                    // Recoloca a mensagem na fila.
-                    // Adicionar retries, para prevenir loop infinito
-                    await channel.BasicNackAsync(args.DeliveryTag, multiple: false, requeue: true);
+                    int retries = 3;
+
+                    for (int i = 0; i < retries; i++)
+                    {
+                        await channel.BasicNackAsync(args.DeliveryTag, multiple: false, requeue: true);
+                    }
                 }
             };
 
             await channel.BasicConsumeAsync(queueName, autoAck: false, consumer, stoppingToken);
 
-            _logger.LogInformation("Worker has started consuming queue messages: {Queue}", queueName);
+            _logger.LogInformation("Background Worker has started consuming queue messages: {Queue}", queueName);
 
             await Task.Delay(Timeout.Infinite, stoppingToken);
         }

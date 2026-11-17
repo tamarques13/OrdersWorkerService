@@ -2,8 +2,8 @@ using OrdersWorkerService.Application.DTOs;
 
 namespace OrdersWorkerService.Application.Interfaces
 {
-    public interface IOrderValidatorService
+    public interface IOrderValidationService
     {
-        List<string> Validate(OrderMessageDto order);
+        List<string> ValidateOrder(OrderMessageDto order);
     }
 }

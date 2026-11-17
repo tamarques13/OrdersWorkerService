@@ -8,7 +8,7 @@ namespace OrdersWorkerService.Domain.Entities
         public DateTime OrderDate { get; private set; }
         public decimal TotalAmount { get; private set; }
         public CurrencyType Currency { get; private set; }
-        public List<OrderItem> Items { get; private set; }
+        public List<OrderItem> Items { get; private set; } = new();
 
         private Order() { }
 
@@ -19,7 +19,7 @@ namespace OrdersWorkerService.Domain.Entities
             if (!Enum.IsDefined(typeof(CurrencyType), currencytype)) throw new ArgumentException($"Invalid Currency type: {currencytype}");
 
             Id = Guid.NewGuid();
-            OrderDate = DateTime.Now;
+            OrderDate = DateTime.UtcNow;
             TotalAmount = totalAmount;
             Currency = currencytype;
         }

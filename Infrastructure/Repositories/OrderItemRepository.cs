@@ -8,11 +8,19 @@ namespace OrdersWorkerService.Infrastructure.Repositories
     {
         private AppDbContext _dbContext = dbContext;
 
-        public async Task AddAsync(OrderItem orderItem)
+        public async Task AddAsync(OrderItem orderItem, CancellationToken cancellationToken)
         {
-            await _dbContext.OrderItems.AddAsync(orderItem);
+            try
+            {
+                await _dbContext.OrderItems.AddAsync(orderItem, cancellationToken);
 
-            await _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _dbContext.ChangeTracker.Clear();
+                throw new Exception("Failed to Save OrderItem in Database.\n Error: \n -", ex);
+            }
         }
     }
-}
+}       

@@ -4,6 +4,6 @@ namespace OrdersWorkerService.Infrastructure.Interfaces
 {
     public interface IOrderItemRepository
     {
-        Task AddAsync(OrderItem orderItem);
+        Task AddAsync(OrderItem orderItem, CancellationToken cancellationToken);
     }
 }

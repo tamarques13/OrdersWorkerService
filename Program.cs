@@ -1,13 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-
-using OrdersWorkerService.Application.Interfaces;
-using OrdersWorkerService.Application.Services;
-
-using OrdersWorkerService.Infrastructure.Hosting;
-using OrdersWorkerService.Infrastructure.Data;
-using OrdersWorkerService.Infrastructure.Interfaces;
-using OrdersWorkerService.Infrastructure.Repositories;
-using OrdersWorkerService.Infrastructure.RabbitMQ;
+using OrdersWorkerService.src.Application.Interfaces;
+using OrdersWorkerService.src.Application.Services;
+using OrdersWorkerService.src.Infrastructure.Data;
+using OrdersWorkerService.src.Infrastructure.Hosting;
+using OrdersWorkerService.src.Infrastructure.Interfaces;
+using OrdersWorkerService.src.Infrastructure.RabbitMQ;
+using OrdersWorkerService.src.Infrastructure.Repositories;
 
 var builder = Host.CreateApplicationBuilder(args);
 
